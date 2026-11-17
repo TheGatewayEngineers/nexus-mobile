@@ -8,22 +8,25 @@ import { AuthProvider, useAuth } from '@/auth/auth-provider';
 SplashScreen.preventAutoHideAsync();
 
 function RootStack() {
-  const { session } = useAuth();
+  const { session, restoring } = useAuth();
   const isSignedIn = !!session;
 
+  // Hold the splash until a saved session is restored, so a signed-in user never sees the landing screen.
   useEffect(() => {
-    SplashScreen.hideAsync();
-  }, []);
+    if (!restoring) SplashScreen.hideAsync();
+  }, [restoring]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
+      {/* auth only redirects to "/", so it must sit behind the signed-out guard too; left unguarded it
+          becomes the fallback once index is blocked and the two redirect into each other forever. */}
       <Stack.Protected guard={!isSignedIn}>
         <Stack.Screen name="index" />
+        <Stack.Screen name="auth" />
       </Stack.Protected>
       <Stack.Protected guard={isSignedIn}>
         <Stack.Screen name="home" />
       </Stack.Protected>
-      <Stack.Screen name="auth" />
     </Stack>
   );
 }

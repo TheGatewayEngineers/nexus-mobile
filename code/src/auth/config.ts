@@ -11,6 +11,9 @@ export const apiAppId = process.env.EXPO_PUBLIC_ENTRA_APIAPP_ID as string;
 /** OIDC issuer; expo-auth-session fetches the authorize/token endpoints from its discovery document. */
 export const issuer = `https://login.microsoftonline.com/${tenantId}/v2.0`;
 
+/** Used directly for refreshes so restoring a session doesn't wait on the discovery fetch. */
+export const tokenEndpoint = `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`;
+
 /**
  * nexusmobile://auth in a development/production build (scheme from app.json).
  * This exact value must be registered on the Entra app under "Mobile and desktop applications".
@@ -20,5 +23,5 @@ export const redirectUri = makeRedirectUri({ scheme: 'nexusmobile', path: 'auth'
 /** offline_access gets a refresh token so we can renew without re-prompting later. */
 export const loginScopes = ['openid', 'profile', 'email', 'offline_access'];
 
-/** Token scope for calling nexus-api (matches apiTokenRequest in nexus-web). Not requested yet. */
-export const apiScope = `api://${apiAppId}/api.access`;
+/** Token scope for calling nexus-api (matches apiRequest in nexus-web's tokenProvider). Default for getAccessToken. */
+export const apiScope = `api://${apiAppId}/access_as_user`;
